@@ -67,10 +67,12 @@ export default class Package extends SfdxCommand {
 
     const toBranch = this.flags.targetref;
     const fromBranch = this.flags.sourceref;
+    
     const diffArgs = ['--no-pager', 'diff', '--name-status', '--no-renames', toBranch, fromBranch];
 
     try {
-      const diffRefs = `${toBranch}...${fromBranch}`;
+      const diffRefs = `${toBranch} ${fromBranch} --not $(git merge-base --all ${toBranch} ${fromBranch})`;
+      //const diffRefs = `${toBranch}...${fromBranch}`;
       const aheadBehind = await spawnPromise('git', ['rev-list', '--left-right', '--count', diffRefs], { shell: true });
       const behind = Number(aheadBehind.split(/(\s+)/)[0]);
       if (behind > 0) {
